@@ -1,4 +1,4 @@
-package config
+package Config
 
 import (
 	"encoding/json"
@@ -6,23 +6,33 @@ import (
 	"os"
 )
 
+const configFilePath = ".gatorconfig.json"
+
 type Config struct {
 	DbUrl           string `json:"db_url"`
 	CurrentUserName string `json:"current_user_name"`
 }
 
-// TODO: Add method on Config struct to set the user on the config
+func (c *Config) SetUser(userName string) error {
+	c.CurrentUserName = userName
+
+	err := write(*c)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // Reads the config data from the config file
 func Read() (Config, error) {
 
-	userHomeDir, err := os.UserHomeDir()
+	configPath, err := getConfigPath()
 
 	if err != nil {
-		return Config{}, fmt.Errorf("Error in finding users home directory: %v", err)
+		return Config{}, err
 	}
-
-	configPath := fmt.Sprintf("%v/.gatorconfig.json", userHomeDir)
 
 	rawConfigContent, err := os.ReadFile(configPath)
 
@@ -39,4 +49,41 @@ func Read() (Config, error) {
 	}
 
 	return config, nil
+}
+
+func getConfigPath() (string, error) {
+
+	userHomeDir, err := os.UserHomeDir()
+
+	if err != nil {
+		return "", fmt.Errorf("Error in finding users home directory: %v", err)
+	}
+
+	configPath := fmt.Sprintf("%v/%v", userHomeDir, configFilePath)
+
+	return configPath, nil
+}
+
+// Writes to the config file
+func write(c Config) error {
+
+	configPath, err := getConfigPath()
+
+	if err != nil {
+		return err
+	}
+
+	json, err := json.Marshal(c)
+
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(configPath, json, 0644)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
