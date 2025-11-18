@@ -2,28 +2,30 @@ package commands
 
 import (
 	"fmt"
-
 	"github.com/Joshua-Lucas/blog-aggregator/internal/config"
 )
 
 type State struct {
-	cfg *config.Config
+	Config *config.Config
 }
 
-type command struct {
-	name string
-	args []string
+type Command struct {
+	Name string
+	Args []string
 }
 
-type commands struct {
-	handlers map[string]func(*State, command) error
+type Commands struct {
+	Handlers map[string]func(*State, Command) error
 }
 
-func (c *commands) run(s *State, cmd command) error {
-	v, ok := c.handlers[cmd.name]
+func (c *Commands) Run(s *State, cmd Command) error {
+	println("commands")
+	println(cmd.Name)
+	println(cmd.Args)
+	v, ok := c.Handlers[cmd.Name]
 
 	if !ok {
-		return fmt.Errorf("There is no handler for the provided command")
+		return fmt.Errorf("There is no handler for the provided Command")
 	}
 
 	err := v(s, cmd)
@@ -35,18 +37,18 @@ func (c *commands) run(s *State, cmd command) error {
 	return nil
 }
 
-func (c *commands) register(name string, f func(*State, command) error) {
-	c.handlers[name] = f
+func (c *Commands) Register(name string, f func(*State, Command) error) {
+	c.Handlers[name] = f
 }
 
-func handlerLogin(s *State, cmd command) error {
-	if len(cmd.args) <= 0 {
+func HandlerLogin(s *State, cmd Command) error {
+	if len(cmd.Args) <= 0 {
 		return fmt.Errorf("Login in handler expects a single argument, the username")
 	}
 
-	userName := cmd.args[0]
+	userName := cmd.Args[0]
 
-	err := s.cfg.SetUser(userName)
+	err := s.Config.SetUser(userName)
 
 	if err != nil {
 		return err
