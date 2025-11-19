@@ -32,10 +32,14 @@ func main() {
 
 	userArg := commands.Command {
 		Name: os.Args[1],
-		Args: []string{os.Args[2]},
+		Args: []string{},
 	}
 
-	//TODO: handle if there is no second arg passesd and send an error
+	if (len(os.Args) > 2) {
+		for _, v := range os.Args[2:] { 
+    	userArg.Args = append(userArg.Args, v)
+		}	
+	}
 
 	err = cmd.Run(&state, userArg)
 
@@ -44,5 +48,4 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("%#v\n", cfg)
 }
