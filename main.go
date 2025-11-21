@@ -5,6 +5,7 @@ import (
 	"os"
 	"github.com/Joshua-Lucas/blog-aggregator/internal/commands"
 	"github.com/Joshua-Lucas/blog-aggregator/internal/config"
+	_ "github.com/lib/pq"
 )
 
 func main() {
