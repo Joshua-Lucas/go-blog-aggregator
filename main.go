@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/Joshua-Lucas/blog-aggregator/internal/commands"
@@ -20,6 +21,11 @@ func main() {
 	}
 
 	db, err := sql.Open("postgres", cfg.DbUrl)
+
+	if err != nil {
+		log.Fatalf("error connecting to db: %v", err)
+	}
+	db.Close()
 
 	dbQueries := database.New(db)
 
