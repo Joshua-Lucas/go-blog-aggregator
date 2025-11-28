@@ -55,7 +55,13 @@ func HandlerLogin(s *State, cmd Command) error {
 
 	userName := cmd.Args[0]
 
-	err := s.Config.SetUser(userName)
+	user, err := s.Db.GetUser(context.Background(), userName)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+	err = s.Config.SetUser(user.Name)
 
 	if err != nil {
 		return err
@@ -74,8 +80,8 @@ func HandlerRegister(s *State, cmd Command) error {
 
 	newUser := database.CreateUserParams{
 		ID:        uuid.New(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
 		Name:      cmd.Args[0],
 	}
 
@@ -86,7 +92,11 @@ func HandlerRegister(s *State, cmd Command) error {
 		os.Exit(1)
 	}
 
-	s.Config.SetUser(user.Name)
+	err = s.Config.SetUser(user.Name)
+
+	if err != nil {
+		return fmt.Errorf("couldn't set current user: %w", err)
+	}
 
 	fmt.Printf("User created: %v", user)
 
