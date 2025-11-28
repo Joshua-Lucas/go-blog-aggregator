@@ -102,3 +102,15 @@ func HandlerRegister(s *State, cmd Command) error {
 
 	return nil
 }
+
+func HandlerReset(s *State, cmd Command) error {
+	err := s.Db.DeleteUsers(context.Background())
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	println("Reset successful")
+	return nil
+}
