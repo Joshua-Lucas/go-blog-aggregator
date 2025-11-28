@@ -1,11 +1,18 @@
 package commands
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/Joshua-Lucas/blog-aggregator/internal/config"
+	"github.com/Joshua-Lucas/blog-aggregator/internal/database"
+	"github.com/google/uuid"
 )
 
 type State struct {
+	Db     *database.Queries
 	Config *config.Config
 }
 
@@ -55,6 +62,33 @@ func HandlerLogin(s *State, cmd Command) error {
 	}
 
 	println("User has been set")
+
+	return nil
+}
+
+func HandlerRegister(s *State, cmd Command) error {
+
+	if len(cmd.Args) <= 0 {
+		return fmt.Errorf("Register command expects a single argument, the username")
+	}
+
+	newUser := database.CreateUserParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      cmd.Args[0],
+	}
+
+	user, err := s.Db.CreateUser(context.Background(), newUser)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	s.Config.SetUser(user.Name)
+
+	fmt.Printf("User created: %v", user)
 
 	return nil
 }

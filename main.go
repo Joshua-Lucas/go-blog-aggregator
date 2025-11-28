@@ -1,10 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
+
 	"github.com/Joshua-Lucas/blog-aggregator/internal/commands"
 	"github.com/Joshua-Lucas/blog-aggregator/internal/config"
+	"github.com/Joshua-Lucas/blog-aggregator/internal/database"
 	_ "github.com/lib/pq"
 )
 
@@ -16,13 +19,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	state := commands.State{Config: &cfg}	
+	db, err := sql.Open("postgres", cfg.DbUrl)
+
+	dbQueries := database.New(db)
+
+	state := commands.State{
+		Db:     dbQueries,
+		Config: &cfg,
+	}
 
 	cmd := commands.Commands{
 		Handlers: make(map[string]func(*commands.State, commands.Command) error),
 	}
 
 	cmd.Register("login", commands.HandlerLogin)
+	cmd.Register("register", commands.HandlerRegister)
 
 	fmt.Println(cmd)
 
@@ -31,15 +42,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	userArg := commands.Command {
+	userArg := commands.Command{
 		Name: os.Args[1],
 		Args: []string{},
 	}
 
-	if (len(os.Args) > 2) {
-		for _, v := range os.Args[2:] { 
-    	userArg.Args = append(userArg.Args, v)
-		}	
+	if len(os.Args) > 2 {
+		for _, v := range os.Args[2:] {
+			userArg.Args = append(userArg.Args, v)
+		}
 	}
 
 	err = cmd.Run(&state, userArg)
