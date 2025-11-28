@@ -25,7 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error connecting to db: %v", err)
 	}
-	db.Close()
+	defer db.Close()
 
 	dbQueries := database.New(db)
 
@@ -40,7 +40,7 @@ func main() {
 
 	cmd.Register("login", commands.HandlerLogin)
 	cmd.Register("register", commands.HandlerRegister)
-
+	cmd.Register("reset", commands.HandlerReset)
 	fmt.Println(cmd)
 
 	if len(os.Args) < 2 {
