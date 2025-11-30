@@ -41,7 +41,7 @@ func main() {
 	cmd.Register("login", commands.HandlerLogin)
 	cmd.Register("register", commands.HandlerRegister)
 	cmd.Register("reset", commands.HandlerReset)
-	fmt.Println(cmd)
+	cmd.Register("users", commands.HandlerUsers)
 
 	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "error: There are less than two arguments.\n")
