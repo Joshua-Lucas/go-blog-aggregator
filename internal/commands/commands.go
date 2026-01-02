@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Joshua-Lucas/blog-aggregator/internal/commands/feed"
 	"github.com/Joshua-Lucas/blog-aggregator/internal/config"
 	"github.com/Joshua-Lucas/blog-aggregator/internal/database"
 	"github.com/google/uuid"
@@ -132,6 +133,20 @@ func HandlerUsers(s *State, cmd Command) error {
 
 		fmt.Printf("%s\n", val.Name)
 	}
+
+	return nil
+}
+
+func HandlerAgg(s *State, cmd Command) error {
+
+	f, err := feed.FetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("%v", f)
 
 	return nil
 }
