@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/Joshua-Lucas/blog-aggregator/internal/commands/feed"
 	"github.com/Joshua-Lucas/blog-aggregator/internal/config"
 	"github.com/Joshua-Lucas/blog-aggregator/internal/database"
+	"github.com/Joshua-Lucas/blog-aggregator/internal/feed"
 	"github.com/google/uuid"
 )
 
