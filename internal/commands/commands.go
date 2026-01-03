@@ -192,3 +192,17 @@ func HandlerAddFeed(s *State, cmd Command) error {
 
 	return nil
 }
+
+func HandlerFeeds(s *State, cmd Command) error {
+
+	feeds, err := s.Db.GetFeeds(context.Background())
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("%v", feeds)
+
+	return nil
+}
