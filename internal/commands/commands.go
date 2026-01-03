@@ -150,3 +150,45 @@ func HandlerAgg(s *State, cmd Command) error {
 
 	return nil
 }
+
+func HandlerAddFeed(s *State, cmd Command) error {
+
+	if len(cmd.Args) <= 0 {
+		return fmt.Errorf("addfeed command expects two arguments, the feed name and feed url")
+	}
+
+	if len(cmd.Args) > 2 || len(cmd.Args) == 1 {
+		return fmt.Errorf("addfeed command expects two arguments, the feed name and feed url. We detect %v arguments passed", len(cmd.Args))
+	}
+
+	userName := s.Config.CurrentUserName
+
+	// Grab current user from database
+	user, err := s.Db.GetUser(context.Background(), userName)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Need arguments of name and url
+	newFeed := database.CreateFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		Name:      cmd.Args[0],
+		Url:       cmd.Args[1],
+		UserID:    user.ID,
+	}
+
+	feed, err := s.Db.CreateFeed(context.Background(), newFeed)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("%v", feed)
+
+	return nil
+}
